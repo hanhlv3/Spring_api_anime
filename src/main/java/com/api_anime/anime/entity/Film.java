@@ -31,7 +31,6 @@ public class Film {
             strategy = GenerationType.SEQUENCE,
             generator = "film_sequence"
     )
-    @Column(name = "film_id")
     private Long filmId;
 
     @Column(

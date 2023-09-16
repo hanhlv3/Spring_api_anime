@@ -30,17 +30,29 @@ public class EpisodeCmt {
     )
     private Long episodeCmtId;
 
-    @Column(
-            name = "user_id",
-            nullable = false
-    )
-    private Long userId;
 
-    @Column(
-            name = "episode_id",
-            nullable = false
+    // user
+    @ManyToOne(
+            cascade = CascadeType.ALL
     )
-    private Long episodeId;
+    @JoinColumn(
+            name = "user_id",
+            referencedColumnName = "userId"
+    )
+    private User user;
+
+
+    // episode
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "episode_id",
+            referencedColumnName = "episodeId"
+    )
+    private Episode episode;
+
+
 
     @Column(
             name = "comment_content",
@@ -50,6 +62,16 @@ public class EpisodeCmt {
 
     @Column(name = "episode_cmt_parent_id")
     private Long episodeCmtParentId;
+
+    @Column(
+            name = "status",
+            columnDefinition = "int default 0"
+
+    ) // 0 - isDefault (not accept) : 1 - accept
+    private int status;
+
+    @Column(name = "film_cmt_parent_id")
+    private Long filmCmtParentId;
 
     @Column(name = "created_at")
     private Date createdAt;

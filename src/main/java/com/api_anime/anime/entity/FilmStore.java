@@ -1,13 +1,14 @@
 package com.api_anime.anime.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 @Entity
 @Data
@@ -19,17 +20,40 @@ import lombok.NoArgsConstructor;
 )
 public class FilmStore {
 
-    @Id
-    @Column(
-            name = "user_id",
-            nullable = false
-    )
-    private Long userId;
 
     @Id
-    @Column(
-            name = "film_id",
-            nullable = false
+    @NotBlank
+    @NotEmpty
+    @SequenceGenerator(
+            name = "film_store_sequence",
+            sequenceName = "film_store_sequence",
+            allocationSize = 1
     )
-    private Long filmId;
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "film_store_sequence"
+    )
+    private Long filmStoreId;
+
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "user_id",
+            referencedColumnName = "userId"
+    )
+    private User user;
+
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "film_id",
+            referencedColumnName = "filmId"
+    )
+    private Film film;
+
+
+    @Column(name = "created_at")
+    private Date createdAt;
 }

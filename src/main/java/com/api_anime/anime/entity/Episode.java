@@ -35,8 +35,15 @@ public class Episode {
     private Long episodeId;
 
 
-    @Column(name = "film_id")
-    private Long filmId;
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "film_id",
+            referencedColumnName = "filmId"
+    )
+    private Film film;
+
 
     @Column(name = "episode_link")
     private String episodeLink;

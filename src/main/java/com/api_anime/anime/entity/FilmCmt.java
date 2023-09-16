@@ -33,17 +33,26 @@ public class FilmCmt {
     )
     private Long filmCmtId;
 
-    @Column(
+    // user
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
             name = "user_id",
-            nullable = false
+            referencedColumnName = "userId"
     )
-    private Long userId;
+    private User user;
 
-    @Column(
-            name = "film_id",
-            nullable = false
+
+    // film
+    @ManyToOne(
+            cascade = CascadeType.ALL
     )
-    private Long filmId;
+    @JoinColumn(
+            name = "film_id",
+            referencedColumnName = "filmId"
+    )
+    private Film film;
 
     @Column(
             name = "comment_content",
@@ -53,6 +62,12 @@ public class FilmCmt {
 
     @Column(name = "film_cmt_parent_id")
     private Long filmCmtParentId;
+
+    @Column(
+            name = "status",
+            columnDefinition = "int default 0"
+    )
+    private int status;
 
     @Column(name = "created_at")
     private Date createdAt;

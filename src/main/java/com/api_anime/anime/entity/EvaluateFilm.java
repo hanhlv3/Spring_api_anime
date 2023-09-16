@@ -8,6 +8,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -32,15 +34,31 @@ public class EvaluateFilm {
             generator = "evaluate_film_sequence"
     )
     private Long evaluateFilmId;
- 
-    @Column(name = "user_id")
-    private Long userId;
 
-   
-    @Column(name = "film_id")
-    private Long filmId;
+    // user
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "user_id",
+            referencedColumnName = "userId"
+    )
+    private User user;
+
+    // film
+    @ManyToOne(
+            cascade = CascadeType.ALL
+    )
+    @JoinColumn(
+            name = "film_id",
+            referencedColumnName = "filmId"
+    )
+    private Film film;
 
     @Column(name = "evaluate_value")
     private int evaluateValue;
+
+    @Column(name = "created_at")
+    private Date createdAt;
 
 }

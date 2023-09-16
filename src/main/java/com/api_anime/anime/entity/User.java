@@ -1,9 +1,7 @@
 package com.api_anime.anime.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,15 +22,20 @@ import java.util.Date;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(
-            name = "user_id",
-            nullable = false
+    @NotBlank
+    @SequenceGenerator(
+            name = "user_sequence",
+            sequenceName = "user_sequence",
+            allocationSize = 1
+    )
+    @GeneratedValue(
+            strategy = GenerationType.SEQUENCE,
+            generator = "user_sequence"
     )
     private Long userId;
 
 
-    @NotBlank(message = "Not null")
+    @NotBlank(message = "User name is invalid")
     @NotEmpty
     @Column(
             name = "user_name",
@@ -52,7 +55,9 @@ public class User {
     )
     private String userEmail;
 
-    @Column(name = "password")
+    @Min(value= 6, message = "Password is than 6 character")
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\\\S+$).{6,}$\n", message = "oke")
+    @Column(name = "password", length = 60)
     private String password;
 
     @Column(name="avatar")
@@ -63,14 +68,12 @@ public class User {
     private String provider;
 
 
-    @Column(name = "token")
-    private String token;
 
-    @Column(name= "remember_token")
-    private String rememberToken;
+    @Column(name = "role")
+    private String role;
 
-    @Column(name = "type_user")
-    private String typeUser;
+    @Column(name = "enabled")
+    private boolean enabled = false;
 
 
     @Column(name = "created_at")
