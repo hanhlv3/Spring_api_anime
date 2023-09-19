@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public VerificationToken generateNewVerificationToken(String oldToken) {
-        VerificationToken verificationToken = verificationTokenRepository.findByToken((oldToken);
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(oldToken);
         verificationToken.setToken(UUID.randomUUID().toString());
         verificationTokenRepository.save(verificationToken);
         return verificationToken;
@@ -94,6 +94,4 @@ public class UserServiceImpl implements UserService {
         PasswordResetToken passwordResetToken = new PasswordResetToken(user, token);
         passwordResetTokenRepository.save(passwordResetToken);
     }
-
-
 }

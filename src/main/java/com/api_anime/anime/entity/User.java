@@ -23,7 +23,7 @@ import java.util.Date;
 @AllArgsConstructor
 @Builder
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @SequenceGenerator(
@@ -70,4 +70,28 @@ public class User {
         this.password = password;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return userName;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 }

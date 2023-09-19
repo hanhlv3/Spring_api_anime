@@ -73,7 +73,6 @@ public class RegisterController {
         sendMaiChangePasswordToken(user, applicationUrl(request), token);
         return "Please check mail !";
 
-
     }
 
     private void sendMaiChangePasswordToken(User user, String applicationUrl, String token) {

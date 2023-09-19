@@ -38,6 +38,7 @@ public class SecurityConfig {
             api +"/verifyRegistration",
             api +"/resendVerifyToken",
             api + "/resetPassword",
+            "/test",
     };
 
 
