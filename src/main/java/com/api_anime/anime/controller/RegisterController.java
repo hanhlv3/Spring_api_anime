@@ -2,6 +2,7 @@ package com.api_anime.anime.controller;
 
 
 import com.api_anime.anime.entity.User;
+import com.api_anime.anime.entity.VerificationToken;
 import com.api_anime.anime.event.RegistrationCompleteEvent;
 import com.api_anime.anime.model.UserModel;
 import com.api_anime.anime.service.UserService;
@@ -13,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.function.EntityResponse;
+
+import java.util.UUID;
 
 
 @RestController()
@@ -27,22 +30,69 @@ public class RegisterController {
     @Autowired
     private ApplicationEventPublisher publisher; // create other thread
 
-
-
-
     @PostMapping(URL_API_PUBLIC + "/register")
-    public UserModel  registerUser(@RequestBody UserModel userModel, final HttpServletRequest request) {
+    public String  registerUser(@RequestBody User userModel, final HttpServletRequest request) {
+
+        User user = userService.registerUser(userModel);
+        publisher.publishEvent( new RegistrationCompleteEvent(
+                user,
+                applicationUrl(request)
+        ));
+        return "Register successfully. Please check email !";
+    }
+
+    @GetMapping(URL_API_PUBLIC + "/verifyRegistration")
+    public String verificationToken(@RequestParam("token") String token) {
+
+        String result = userService.verificationToken(token);
+        if(result.equalsIgnoreCase("valid"))  return "User verified successfully";
+        else if(result.equalsIgnoreCase("")) return "Token is expired";
+        return "Bad user";
+    }
+    @GetMapping(URL_API_PUBLIC + "/resendVerifyToken")
+    public String resendVerifyToken(@RequestParam("token") String oldToken, HttpServletRequest request) {
+
+        VerificationToken verificationToken = userService.generateNewVerificationToken(oldToken);
+        User user = verificationToken.getUser();
+        resendVerifyTokenMail(user, applicationUrl(request), verificationToken);
+        return "Bad user";
+    }
+
+    // change password
+    @GetMapping(URL_API_PUBLIC + "/resetPassword")
+    public String resetPassword(@RequestParam("email") String email, HttpServletRequest request) {
+        User user = userService.findUserByEmail(email);
+
+        if(user == null) return "Email incorrect";
+
+        // create token
+        String token = UUID.randomUUID().toString();
+        userService.savePasswordResetToken(user, token);
+
+        // send to email
+        sendMaiChangePasswordToken(user, applicationUrl(request), token);
+        return "Please check mail !";
 
 
-        return userModel;
-//
-//        User user = userService.registerUser(userModel);
-//        publisher.publishEvent( new RegistrationCompleteEvent(
-//                user,
-//                applicationUrl(request)
-//        ));
-//
-//        return "resgiter succesfully";
+    }
+
+    private void sendMaiChangePasswordToken(User user, String applicationUrl, String token) {
+        String url = applicationUrl
+                + "/api/v1/verifyTokenChangePassword?token="
+                + token;
+        // sendVerificationEmail()
+        log.info("Click the link to change your password {}",
+                url);
+    }
+
+
+    private void resendVerifyTokenMail(User user, String applicationUrl, VerificationToken verificationToken) {
+        String url = applicationUrl
+                + "/api/v1/verifyRegistration?token="
+                + verificationToken.getToken();
+        // sendVerificationEmail()
+        log.info("Click the link to verify your account: {}",
+                url);
     }
 
     private String applicationUrl(HttpServletRequest request) {

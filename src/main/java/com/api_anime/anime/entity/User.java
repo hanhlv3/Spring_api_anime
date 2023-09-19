@@ -7,9 +7,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 
 
@@ -22,7 +26,6 @@ import java.util.Date;
 public class User {
 
     @Id
-    @NotBlank
     @SequenceGenerator(
             name = "user_sequence",
             sequenceName = "user_sequence",
@@ -35,51 +38,36 @@ public class User {
     private Long userId;
 
 
-    @NotBlank(message = "User name is invalid")
-    @NotEmpty
-    @Column(
-            name = "user_name",
-            nullable = false,
-            unique = true
-    )
+    @Column(nullable = false)
     private String userName;
 
-    @NotBlank(message = "User email is invalid")
+    @Column(nullable = false)
     @Email
-    @NotEmpty
-    @UniqueElements
-    @Column(
-            name = "user_email",
-            nullable = false,
-            unique = true
-    )
-    private String userEmail;
+    private String email;
 
-    @Min(value= 6, message = "Password is than 6 character")
-    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\\\S+$).{6,}$\n", message = "oke")
-    @Column(name = "password", length = 60)
+
+    @NotBlank(message = "Not found password")
+    @Column(nullable = false)
     private String password;
 
-    @Column(name="avatar")
     private String avatar;
 
-
-    @Column(name = "provider")
     private String provider;
 
 
 
-    @Column(name = "role")
     private String role;
 
-    @Column(name = "enabled")
     private boolean enabled = false;
 
-
-    @Column(name = "created_at")
     private Date createdAt;
 
-    @Column(name = "updated_at")
     private Date updatedAt;
+
+    public User(String userName, String email, String password) {
+        this.userName = userName;
+        this.email = email;
+        this.password = password;
+    }
 
 }

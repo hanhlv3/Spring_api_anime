@@ -22,7 +22,7 @@ public class UserModel {
     public String toString() {
         return "UserModel{" +
                 "userName='" + userName + '\'' +
-                ", userEmail='" + userEmail + '\'' +
+                ", email='" + userEmail + '\'' +
                 ", password='" + password + '\'' +
                 '}';
     }
