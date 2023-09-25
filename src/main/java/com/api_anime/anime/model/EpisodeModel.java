@@ -5,12 +5,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class EmailDetails {
+@AllArgsConstructor
+public class EpisodeModel {
 
-    private String recipient;
-    private String msgBody;
-    private String subject;
+    private String episodeLink;
+    private long episodeNumber;
+    private long filmId;
 
 }

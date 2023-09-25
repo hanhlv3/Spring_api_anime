@@ -38,22 +38,25 @@ public class SecurityConfig {
             api +"/verifyRegistration",
             api +"/resendVerifyToken",
             api + "/resetPassword",
+            api + "/login",
             "/test",
+            "/files/**",
+            api + "/public/**"
     };
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
          http
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(auth -> auth
+                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(WHITE_LIST_URLS).permitAll()
                         .requestMatchers("/api/v1/private/**").hasAnyAuthority("ADMIN")
+                        .anyRequest().authenticated()
                 )
                  .authenticationProvider(authenticationProvider)
                  .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .sessionManagement(sess -> sess.sessionCreationPolicy(STATELESS));
+                 .sessionManagement(sess -> sess.sessionCreationPolicy(STATELESS));
 
         return http.build();
     }

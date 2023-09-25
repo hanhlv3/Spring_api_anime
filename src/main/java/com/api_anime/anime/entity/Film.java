@@ -9,7 +9,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -50,10 +53,30 @@ public class Film {
     @Column(name = "release_date")
     private Date releaseDate;
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "film_category_map",
+            joinColumns = @JoinColumn(
+                    name = "film_id",
+                    referencedColumnName = "filmId"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "category_id",
+                    referencedColumnName = "categoryId"
+            )
+    )
+    private List<Category> categories;
+
     @Column(name = "created_at")
-    private Date createdAt;
+    private Date createdAt = Calendar.getInstance().getTime();
 
     @Column(name = "updated_at")
     private Date updatedAt;
+
+    public void addCategory(Category category) {
+        if(categories.isEmpty()) this.categories = new ArrayList<>();
+        categories.add(category);
+    }
+
 
 }

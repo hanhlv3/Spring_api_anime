@@ -3,7 +3,7 @@ package com.api_anime.anime.service;
 import com.api_anime.anime.entity.PasswordResetToken;
 import com.api_anime.anime.entity.User;
 import com.api_anime.anime.entity.VerificationToken;
-import com.api_anime.anime.model.UserModel;
+import com.api_anime.anime.model.Role;
 import com.api_anime.anime.repository.PasswordResetTokenRepository;
 import com.api_anime.anime.repository.UserRepository;
 import com.api_anime.anime.repository.VerificationTokenRepository;
@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
 
         userModel.setPassword(passwordEncoder.encode(userModel.getPassword()));
         userModel.setCreatedAt(Calendar.getInstance().getTime());
-        userModel.setRole("user");
+        userModel.setRole(Role.USER);
         userRepository.save(userModel);
         return userModel;
     }
@@ -84,8 +84,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User findUserByEmail(String email) {
-        User user = userRepository.findByEmail(email).get();
+    public  Optional<User> findUserByEmail(String email) {
+       Optional<User> user = userRepository.findByEmail(email);
         return user;
     }
 

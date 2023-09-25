@@ -3,10 +3,8 @@ package com.api_anime.anime.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,8 +21,6 @@ import java.util.List;
 public class Category {
 
     @Id
-    @NotBlank
-    @NotEmpty
     @SequenceGenerator(
             name = "category_sequence",
             sequenceName = "category_sequence",
@@ -37,13 +33,15 @@ public class Category {
     private Long categoryId;
 
     @NotBlank(message = "Category name not valid")
-    @NotEmpty()
-    @Column(name = "category_name")
+    @NotNull
+    @Column(
+            name = "category_name",
+            nullable = false
+
+    )
     private String categoryName;
 
-    @ManyToMany(
-            cascade = CascadeType.ALL
-    )
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "film_category_map",
             joinColumns = @JoinColumn(
@@ -51,14 +49,9 @@ public class Category {
                     referencedColumnName = "categoryId"
             ),
             inverseJoinColumns = @JoinColumn(
-                    table = "films",
                     name = "film_id",
                     referencedColumnName = "filmId"
             )
     )
     private List<Film> films;
-    public void addFilms(Film film) {
-        if(films.isEmpty()) films = new ArrayList<>();
-        films.add(film);
-    }
 }

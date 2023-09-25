@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity
@@ -55,7 +56,7 @@ public class Episode {
 
 
     @Column(name = "created_at")
-    private Date createdAt;
+    private Date createdAt = Calendar.getInstance().getTime();
 
     @Column(name = "updated_at")
     private Date updatedAt;

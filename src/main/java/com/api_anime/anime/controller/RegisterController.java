@@ -5,6 +5,7 @@ import com.api_anime.anime.entity.User;
 import com.api_anime.anime.entity.VerificationToken;
 import com.api_anime.anime.event.RegistrationCompleteEvent;
 import com.api_anime.anime.model.UserModel;
+import com.api_anime.anime.service.EmailService;
 import com.api_anime.anime.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -26,6 +27,10 @@ public class RegisterController {
     private static final String URL_API_PUBLIC = "/api/v1";
     @Autowired(required = false)
     private UserService userService;
+
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private ApplicationEventPublisher publisher; // create other thread
@@ -61,8 +66,7 @@ public class RegisterController {
     // change password
     @GetMapping(URL_API_PUBLIC + "/resetPassword")
     public String resetPassword(@RequestParam("email") String email, HttpServletRequest request) {
-        User user = userService.findUserByEmail(email);
-
+        User user = userService.findUserByEmail(email).get();
         if(user == null) return "Email incorrect";
 
         // create token
@@ -100,5 +104,4 @@ public class RegisterController {
                 ":" + request.getServerPort() +
                 request.getContextPath();
     }
-
 }

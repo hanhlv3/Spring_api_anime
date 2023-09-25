@@ -5,6 +5,8 @@ import com.api_anime.anime.entity.VerificationToken;
 import com.api_anime.anime.model.UserModel;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public interface UserService {
 
@@ -17,7 +19,7 @@ public interface UserService {
     VerificationToken generateNewVerificationToken(String oldToken);
 
 
-    User findUserByEmail(String email);
+    Optional<User> findUserByEmail(String email);
 
     void savePasswordResetToken(User user, String token);
 }

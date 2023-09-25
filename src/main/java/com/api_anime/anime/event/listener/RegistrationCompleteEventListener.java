@@ -2,6 +2,8 @@ package com.api_anime.anime.event.listener;
 
 import com.api_anime.anime.entity.User;
 import com.api_anime.anime.event.RegistrationCompleteEvent;
+import com.api_anime.anime.model.EmailDetails;
+import com.api_anime.anime.service.EmailService;
 import com.api_anime.anime.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.Comments;
@@ -20,6 +22,9 @@ public class RegistrationCompleteEventListener implements
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private EmailService emailService;
+
     @Override
     public void onApplicationEvent(RegistrationCompleteEvent event) {
         // Create the Verification Token for the User with link
@@ -33,6 +38,13 @@ public class RegistrationCompleteEventListener implements
                     + token;
 
         // send VerificationEmail()
+        EmailDetails emailDetails = new EmailDetails(user.getEmail(), "Click to link : " + url, "Verification account");
+
+        try {
+            emailService.sendEmail(emailDetails);
+        } catch (Exception exception)  {
+            throw  new RuntimeException(exception.getMessage());
+        }
         log.info("Click the link to verify your account: {}", url);
 
 

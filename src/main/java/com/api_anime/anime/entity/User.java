@@ -1,5 +1,6 @@
 package com.api_anime.anime.entity;
 
+import com.api_anime.anime.model.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 
 @Entity
@@ -56,7 +58,8 @@ public class User implements UserDetails {
 
 
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     private boolean enabled = false;
 
@@ -70,19 +73,23 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
+    public String getRealUserName() {
         return userName;
     }
 
     @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override

@@ -7,10 +7,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EmailDetails {
+public class EvaluateModel {
 
-    private String recipient;
-    private String msgBody;
-    private String subject;
-
+    private long evaluateValue;
+    private long filmId;
 }

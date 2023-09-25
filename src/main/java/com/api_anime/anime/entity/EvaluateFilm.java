@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Calendar;
 import java.util.Date;
 
 @Entity
@@ -20,7 +21,6 @@ import java.util.Date;
 )
 public class EvaluateFilm {
 
-   
     @Id
     @NotBlank
     @NotEmpty
@@ -59,6 +59,6 @@ public class EvaluateFilm {
     private int evaluateValue;
 
     @Column(name = "created_at")
-    private Date createdAt;
+    private Date createdAt = Calendar.getInstance().getTime();
 
 }
