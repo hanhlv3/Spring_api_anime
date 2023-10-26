@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -54,4 +56,10 @@ public class Category {
             )
     )
     private List<Film> films;
+
+    @Column(name = "created_at")
+    private Date createdAt = Calendar.getInstance().getTime();
+
+    @Column(name = "updated_at")
+    private Date updatedAt;
 }

@@ -11,5 +11,7 @@ import java.util.List;
 public interface EpisodeRepository extends JpaRepository<Episode, Long> {
 
     List<Episode> findAllByFilm(Film film);
+
+    void deleteAllByFilm(Film film);
     void deleteByEpisodeId(long id);
 }

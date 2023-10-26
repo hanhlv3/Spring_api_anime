@@ -1,9 +1,11 @@
 package com.api_anime.anime.service;
 
+import com.api_anime.anime.db.ConnectDB;
 import com.api_anime.anime.entity.Episode;
 import com.api_anime.anime.entity.Film;
 import com.api_anime.anime.model.EpisodeModel;
 import com.api_anime.anime.repository.EpisodeRepository;
+import com.api_anime.anime.repository.EpisodeTest;
 import com.api_anime.anime.repository.FilmRepository;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
@@ -13,6 +15,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Calendar;
 import java.util.List;
 
@@ -29,6 +34,10 @@ public class EpisodeServiceImpl implements  EpisodeService{
 
     @Autowired
     private EntityManager entityManager;
+
+    @Autowired
+    private EpisodeTest episodeTest;
+
     @Override
     public Episode getEpisodeById(long id) {
         Episode episode = episodeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException());
@@ -36,7 +45,7 @@ public class EpisodeServiceImpl implements  EpisodeService{
     }
 
     @Override
-    public List<Episode> getAllEpisodeByFilm(long id) {
+    public List<Episode> getAllEpisodeByFilm(Long id) {
         Film film = filmRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Not found film"));
         List<Episode> episodeList = episodeRepository.findAllByFilm(film);
         return episodeList;
@@ -93,5 +102,24 @@ public class EpisodeServiceImpl implements  EpisodeService{
     @Override
     public List<Episode> getAllEpisode() {
         return  episodeRepository.findAll();
+    }
+
+    @Override
+    public int getCurrentNumber(Long id) {
+        try {
+            Connection conn = ConnectDB.connectDB();
+            String query = "select * from episodes";
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()) {
+                System.out.print(rs.getInt(1));
+            }
+            return rs.getFetchSize();
+
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return 0;
     }
 }

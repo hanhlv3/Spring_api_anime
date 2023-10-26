@@ -7,19 +7,19 @@ import com.api_anime.anime.entity.User;
 import com.api_anime.anime.execptions.BadRequestException;
 import com.api_anime.anime.model.EvaluateModel;
 import com.api_anime.anime.model.FilmModel;
-import com.api_anime.anime.repository.CategoryRepository;
-import com.api_anime.anime.repository.EvaluateFilmRepository;
-import com.api_anime.anime.repository.FilmRepository;
-import com.api_anime.anime.repository.UserRepository;
+import com.api_anime.anime.repository.*;
 import com.api_anime.anime.utils.CheckFile;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -33,6 +33,8 @@ import java.util.concurrent.ExecutionException;
 
 @Service
 @Slf4j
+@Scope(proxyMode = ScopedProxyMode.INTERFACES)
+@Transactional
 public class FilmServiceImpl implements FilmService {
 
     @Autowired
@@ -49,6 +51,9 @@ public class FilmServiceImpl implements FilmService {
 
     @Autowired
     private EvaluateFilmRepository evaluateFilmRepository;
+
+    @Autowired
+    private EpisodeRepository episodeRepository;
 
     private final Path storageFolder = Paths.get("uploads");
 
@@ -70,12 +75,6 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public List<Film> getAllFimls() {
         List<Film> filmList = filmRepository.findAll();
-
-        for (Film f: filmList) {
-            for (Category cat: f.getCategories()) {
-                cat.setFilms(null);
-            }
-        }
         return filmList;
     }
 
@@ -145,7 +144,6 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public Film updateFilm(long id, MultipartFile file, FilmModel filmModel) throws IOException {
 
-
         // check film is exits
         Optional<Film> film = filmRepository.findById(id);
         if(film.isEmpty()) throw  new BadRequestException();
@@ -153,12 +151,12 @@ public class FilmServiceImpl implements FilmService {
         Film filmUpdate = film.get();
 
         // check has update image
-        if(!file.isEmpty()) {
+        if(file != null) {
             // delete old image
-            String oldImage = filmUpdate.getImg();
-
-            Path filePathOld = Paths.get("uploads/" + oldImage);
-            Files.delete(filePathOld);
+//            String oldImage = filmUpdate.getImg();
+//
+//            Path filePathOld = Paths.get("uploads/" + oldImage);
+//            Files.delete(filePathOld);
 
             // add new image
             String fileExtension = FilenameUtils.getExtension(file.getOriginalFilename());
@@ -171,7 +169,6 @@ public class FilmServiceImpl implements FilmService {
             // update new image
             filmUpdate.setImg(generatedFileName);
         }
-
 
 
         List<Category> categoryList = new ArrayList<>();
@@ -199,15 +196,16 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public void deleteFilm(Film film) {
         // delete image
-        String oldImage = film.getImg();
-        Path filePathOld = Paths.get("uploads/" + oldImage);
-
+//        episodeRepository.deleteAllByFilm(film);
+//        String oldImage = film.getImg();
+//
+//        Path filePathOld = Paths.get("uploads/" + oldImage);
+//        try {
+//            Files.delete(filePathOld);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
         film.getCategories().clear();
-        try {
-            Files.delete(filePathOld);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         filmRepository.delete(film);
     }
 

@@ -78,5 +78,11 @@ public class Film {
         categories.add(category);
     }
 
+    @Transient
+    private double score;
+
+    @Transient
+    private int currentEpisode;
+
 
 }

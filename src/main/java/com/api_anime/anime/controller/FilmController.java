@@ -1,10 +1,15 @@
 package com.api_anime.anime.controller;
 
 
+import com.api_anime.anime.db.ConnectDB;
+import com.api_anime.anime.db.EpisodeDB;
+import com.api_anime.anime.entity.Category;
 import com.api_anime.anime.entity.Film;
 import com.api_anime.anime.model.EvaluateModel;
 import com.api_anime.anime.model.ObjectResponse;
 import com.api_anime.anime.model.FilmModel;
+import com.api_anime.anime.service.EpisodeService;
+import com.api_anime.anime.service.EvaluateService;
 import com.api_anime.anime.service.FilmService;
 import com.api_anime.anime.utils.ApplicationUrl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +26,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +38,24 @@ public class FilmController {
 
     @Autowired
     private FilmService filmService;
+
+    @Autowired
+    private EpisodeService episodeService;
+
+    @Autowired
+    private EvaluateService evaluateService;
+
+    private  static Connection conn;
+
+    static {
+        try {
+            conn = ConnectDB.connectDB();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 
     // get film by id
@@ -60,9 +86,21 @@ public class FilmController {
 
     // get all film
     @GetMapping("/api/v1/public/film")
-    private ResponseEntity<List<Film>> getAllFilms() {
+    private ResponseEntity<List<Film>> getAllFilms(HttpServletRequest request) throws SQLException {
 
-        List<Film> filmList = filmService.getAllFimls();
+        List<Film> filmList =  filmService.getAllFimls();
+        for (Film film: filmList) {
+
+            film.setImg(ApplicationUrl.getUrlImage(film.getImg(), request));
+            for (Category category: film.getCategories()) {
+                category.setFilms(null);
+            }
+
+            double score = evaluateService.getScoreByFilmId(film);
+            int currentEpisode = EpisodeDB.getEpisodeCurrent(conn, film.getFilmId());
+            film.setScore(score);
+            film.setCurrentEpisode(currentEpisode);
+        }
         return ResponseEntity.ok(filmList);
     }
 
@@ -83,17 +121,23 @@ public class FilmController {
 
 
     // insert film
-    @PostMapping(("/api/v1/private/film"))
-    private ResponseEntity<?> insertFilm(@RequestParam("image") MultipartFile images, @RequestParam("data") String dataString,  HttpServletRequest request) {
+    @PostMapping(path = "/api/v1/private/film", consumes = {"multipart/form-data"})
+    private ResponseEntity<?> insertFilm(@RequestPart("film")
+                                             String dataString, @RequestPart("image") MultipartFile image,
+                                         HttpServletRequest request) {
         String urlDir = "";
+
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             FilmModel filmModel = objectMapper.readValue(dataString, FilmModel.class);
 
-            Film film = filmService.insertFilm(images, filmModel);
+            Film film = filmService.insertFilm(image, filmModel);
             film.setImg(ApplicationUrl.getUrlImage(film.getImg(), request));
 
             //Thread.sleep(1000*50);
+            for (Category cat: film.getCategories() ) {
+                cat.setFilms(null);
+            }
             return ResponseEntity.ok(film);
         } catch (Exception e) {
             log.info("error: " + e.getMessage());
@@ -105,14 +149,18 @@ public class FilmController {
 
     @PutMapping("/api/v1/private/film/{id}")
     private ResponseEntity<?> updateFilm(@PathVariable("id") long id,
-                                         @RequestParam("image") MultipartFile images,
-                                         @RequestParam("data") String dataString,
+                                         @RequestParam(value="image", required = false) MultipartFile image,
+                                         @RequestParam("film") String dataString,
                                          HttpServletRequest request) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             FilmModel filmModel = objectMapper.readValue(dataString, FilmModel.class);
-            Film film = filmService.updateFilm(id, images, filmModel);
+            Film film = filmService.updateFilm(id, image, filmModel);
             film.setImg(ApplicationUrl.getUrlImage(film.getImg(), request));
+
+            for (Category category: film.getCategories() ) {
+                category.setFilms(null);
+            }
 
             return ResponseEntity.ok(film);
         } catch (JsonProcessingException e) {
@@ -120,6 +168,7 @@ public class FilmController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
     }
 
     // delete film

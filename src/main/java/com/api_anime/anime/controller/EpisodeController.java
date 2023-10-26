@@ -1,6 +1,7 @@
 package com.api_anime.anime.controller;
 
 
+import com.api_anime.anime.entity.Category;
 import com.api_anime.anime.entity.Episode;
 import com.api_anime.anime.model.EpisodeModel;
 import com.api_anime.anime.model.ObjectResponse;
@@ -33,6 +34,10 @@ public class EpisodeController {
     @GetMapping("/api/v1/public/episode/film/{id}")
     public ResponseEntity<?> getAllEpisodeByFilm(@PathVariable("id") long id) {
         List<Episode> episodeList =  episodeService.getAllEpisodeByFilm(id);
+        for (Episode episode: episodeList) {
+
+           episode.setFilm(null);
+        }
         return ResponseEntity.ok(episodeList);
     }
 
@@ -48,6 +53,9 @@ public class EpisodeController {
     @PostMapping("/api/v1/private/episode")
     public ResponseEntity<?>  insertEpisode(@RequestBody EpisodeModel episodeModel) {
         Episode episode = episodeService.insertEpisode(episodeModel);
+        for(Category category: episode.getFilm().getCategories()) {
+            category.setFilms(null);
+        }
         return ResponseEntity.ok(episode);
     }
 
@@ -59,7 +67,7 @@ public class EpisodeController {
     }
 
     // delete a episode
-    @DeleteMapping("/api/v1/public/episode/{id}")
+    @DeleteMapping("/api/v1/private/episode/{id}")
     public ResponseEntity<?>  deleteEpisode(@PathVariable("id") long id) {
         log.info(id + "ddd");
         episodeService.deleteEpisode(id);

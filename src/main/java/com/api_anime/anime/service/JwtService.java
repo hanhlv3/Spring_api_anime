@@ -1,5 +1,6 @@
 package com.api_anime.anime.service;
 
+import com.api_anime.anime.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -27,14 +28,17 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return generateToken(new HashMap<>(), userDetails);
+    public String generateToken(UserDetails userDetails, User user) {
+        return generateToken(new HashMap<>(), userDetails, user);
     }
 
     public String generateToken(
             Map<String, Object> extraClaims,
-            UserDetails userDetails
+            UserDetails userDetails,
+            User user
     ) {
+        extraClaims.put("role", user.getRole());
+        extraClaims.put("username", user.getRealUserName());
         return Jwts
                 .builder()
                 .setClaims(extraClaims)

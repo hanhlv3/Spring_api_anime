@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @Slf4j
 public class CategoryController {
 
@@ -43,14 +44,13 @@ public class CategoryController {
     }
 
     @PostMapping("/api/v1/private/category")
-    private ResponseEntity<Category> insertCategory(@RequestBody @Valid CategoryModel category, BindingResult bindingResult) {
+    private ResponseEntity<Category> insertCategory(@RequestBody CategoryModel category, BindingResult bindingResult) {
         if(bindingResult.hasErrors()) {
             throw new BadRequestException();
         }
         Category result = categoryService.insertCategory(category);
         return ResponseEntity.ok(result);
     }
-
     @PutMapping("/api/v1/private/category/{id}")
     private ResponseEntity<?> updateCategory(@PathVariable long id, @RequestBody CategoryModel categoryModel) {
 
@@ -59,7 +59,7 @@ public class CategoryController {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
                     .body(new ObjectResponse(400, "Category not exist"));
-
+        category.setFilms(null);
         return ResponseEntity.ok(category);
     }
 
