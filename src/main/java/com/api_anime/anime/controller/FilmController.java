@@ -125,7 +125,7 @@ public class FilmController {
     private ResponseEntity<?> insertFilm(@RequestPart("film")
                                              String dataString, @RequestPart("image") MultipartFile image,
                                          HttpServletRequest request) {
-        String urlDir = "";
+//        String urlDir = "";
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();

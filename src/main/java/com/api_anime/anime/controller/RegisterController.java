@@ -7,6 +7,7 @@ import com.api_anime.anime.event.RegistrationCompleteEvent;
 import com.api_anime.anime.model.UserModel;
 import com.api_anime.anime.service.EmailService;
 import com.api_anime.anime.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.apache.catalina.core.ApplicationPushBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.function.EntityResponse;
 
 import java.util.UUID;
@@ -36,13 +38,21 @@ public class RegisterController {
     private ApplicationEventPublisher publisher; // create other thread
 
     @PostMapping(URL_API_PUBLIC + "/register")
-    public String  registerUser(@RequestBody User userModel, final HttpServletRequest request) {
+    public String  registerUser(@RequestPart("user") String dataString, @RequestPart("image")MultipartFile image,  final HttpServletRequest request) {
 
-        User user = userService.registerUser(userModel);
-        publisher.publishEvent( new RegistrationCompleteEvent(
-                user,
-                applicationUrl(request)
-        ));
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            UserModel userModel = objectMapper.readValue(dataString, UserModel.class);
+            System.out.println(userModel.toString());
+            User user = userService.registerUser(userModel, image);
+            publisher.publishEvent( new RegistrationCompleteEvent(
+                    user,
+                    applicationUrl(request)
+            ));
+        } catch (Exception e) {
+            log.info("error", e);
+        }
+
         return "Register successfully. Please check email !";
     }
 
